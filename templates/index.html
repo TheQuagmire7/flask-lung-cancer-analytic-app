@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Lung Cancer Risk Classification
+    </title>
+
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <!-- Custom CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     NAVBAR
+====================================================== -->
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+
+    <div class="container">
+
+        <a class="navbar-brand fw-bold" href="/">
+
+            <span class="brand-icon">
+                <i class="bi bi-lungs-fill"></i>
+            </span>
+
+            Lung Cancer
+
+        </a>
+
+
+        <span class="system-status">
+
+            <span class="status-dot"></span>
+
+            {% if models_loaded %}
+                Models Loaded
+            {% else %}
+                Model Error
+            {% endif %}
+
+        </span>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+
+<section class="hero">
+
+    <div class="container">
+
+        <div class="hero-wrapper">
+
+            <div class="hero-icon">
+
+                <i class="bi bi-lungs-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="hero-label">
+                    MACHINE LEARNING CLASSIFICATION SYSTEM
+                </div>
+
+                <h1>
+                    Lung Cancer Risk Classification
+                </h1>
+
+                <p>
+                    Classification of lung cancer risk based on
+                    patient medical history, lifestyle habits,
+                    and symptoms using Logistic Regression and
+                    Random Forest.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     DASHBOARD STATISTICS
+====================================================== -->
+
+<div class="container dashboard-container">
+
+    <div class="row g-3">
+
+
+        <!-- Dataset -->
+
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="bi bi-database-fill"></i>
+                </div>
+
+                <div>
+
+                    <small>
+                        Dataset
+                    </small>
+
+                    <h3>
+                        {{ dataset_rows }}
+                    </h3>
+
+                    <span>
+                        Records
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Features -->
+
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </div>
+
+                <div>
+
+                    <small>
+                        Features
+                    </small>
+
+                    <h3>
+                        15
+                    </h3>
+
+                    <span>
+                        Patient Variables
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Models -->
+
+        <div class="col-md-4">
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="bi bi-cpu-fill"></i>
+                </div>
+
+                <div>
+
+                    <small>
+                        Classification Models
+                    </small>
+
+                    <h3>
+                        2
+                    </h3>
+
+                    <span>
+                        Logistic + Random Forest
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         MODEL INFORMATION
+    =================================================== -->
+
+    <div class="row g-3 mt-1">
+
+
+        <div class="col-md-6">
+
+            <div class="model-info-card">
+
+                <div class="model-info-icon">
+
+                    <i class="bi bi-diagram-3-fill"></i>
+
+                </div>
+
+                <div class="model-info-content">
+
+                    <h5>
+                        Logistic Regression
+                    </h5>
+
+                    <p>
+                        Statistical classification model
+                        used to estimate the probability of
+                        lung cancer risk.
+                    </p>
+
+                    <span class="loaded-badge">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Model Loaded
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-md-6">
+
+            <div class="model-info-card">
+
+                <div class="model-info-icon forest">
+
+                    <i class="bi bi-tree-fill"></i>
+
+                </div>
+
+                <div class="model-info-content">
+
+                    <h5>
+                        Random Forest
+                    </h5>
+
+                    <p>
+                        Ensemble classification model based
+                        on multiple decision trees.
+                    </p>
+
+                    <span class="loaded-badge">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Model Loaded
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         MAIN DASHBOARD
+    =================================================== -->
+
+    <div class="row g-4 mt-2">
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <div class="col-xl-7">
+
+            <div class="dashboard-card">
+
+
+                <div class="card-title-area">
+
+                    <div>
+
+                        <span class="small-label">
+                            PATIENT ASSESSMENT
+                        </span>
+
+                        <h4>
+                            Patient Risk Assessment
+                        </h4>
+
+                        <p>
+                            Complete all fields to perform
+                            the classification.
+                        </p>
+
+                    </div>
+
+                    <div class="title-icon">
+
+                        <i class="bi bi-clipboard2-pulse-fill"></i>
+
+                    </div>
+
+                </div>
+
+
+
+                <form
+                    action="/predict"
+                    method="POST"
+                    id="predictionForm">
+
+
+                    <!-- ======================================
+                         PATIENT INFORMATION
+                    ======================================= -->
+
+                    <div class="form-section">
+
+                        <div class="section-heading">
+
+                            <div class="number">
+                                01
+                            </div>
+
+                            <div>
+
+                                <h5>
+                                    Patient Information
+                                </h5>
+
+                                <span>
+                                    Basic demographic information
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Gender
+                                </label>
+
+                                <select
+                                    name="GENDER"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Gender
+                                    </option>
+
+                                    <option value="1">
+                                        Male
+                                    </option>
+
+                                    <option value="0">
+                                        Female
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Age
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-fill"></i>
+                                    </span>
+
+                                    <input
+                                        type="number"
+                                        name="AGE"
+                                        class="form-control"
+                                        min="1"
+                                        max="120"
+                                        placeholder="Age"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ======================================
+                         LIFESTYLE
+                    ======================================= -->
+
+                    <div class="form-section">
+
+                        <div class="section-heading">
+
+                            <div class="number">
+                                02
+                            </div>
+
+                            <div>
+
+                                <h5>
+                                    Lifestyle Habits
+                                </h5>
+
+                                <span>
+                                    Lifestyle and behavioral factors
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+
+                            <!-- Smoking -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Smoking
+                                </label>
+
+                                <select
+                                    name="SMOKING"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Yellow Fingers -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Yellow Fingers
+                                </label>
+
+                                <select
+                                    name="YELLOW_FINGERS"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Anxiety -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Anxiety
+                                </label>
+
+                                <select
+                                    name="ANXIETY"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Peer Pressure -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Peer Pressure
+                                </label>
+
+                                <select
+                                    name="PEER_PRESSURE"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Alcohol -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Alcohol Consuming
+                                </label>
+
+                                <select
+                                    name="ALCOHOL_CONSUMING"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Chronic Disease -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Chronic Disease
+                                </label>
+
+                                <select
+                                    name="CHRONIC_DISEASE"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ======================================
+                         SYMPTOMS
+                    ======================================= -->
+
+                    <div class="form-section">
+
+                        <div class="section-heading">
+
+                            <div class="number">
+                                03
+                            </div>
+
+                            <div>
+
+                                <h5>
+                                    Symptoms
+                                </h5>
+
+                                <span>
+                                    Patient symptoms and conditions
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+
+                            <!-- Fatigue -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Fatigue
+                                </label>
+
+                                <select
+                                    name="FATIGUE"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Allergy -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Allergy
+                                </label>
+
+                                <select
+                                    name="ALLERGY"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Wheezing -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Wheezing
+                                </label>
+
+                                <select
+                                    name="WHEEZING"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Coughing -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Coughing
+                                </label>
+
+                                <select
+                                    name="COUGHING"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Shortness of Breath -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Shortness of Breath
+                                </label>
+
+                                <select
+                                    name="SHORTNESS_OF_BREATH"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Swallowing -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Swallowing Difficulty
+                                </label>
+
+                                <select
+                                    name="SWALLOWING_DIFFICULTY"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Chest Pain -->
+
+                            <div class="col-md-6">
+
+                                <label>
+                                    Chest Pain
+                                </label>
+
+                                <select
+                                    name="CHEST_PAIN"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">
+                                        Select Answer
+                                    </option>
+
+                                    <option value="1">
+                                        No
+                                    </option>
+
+                                    <option value="2">
+                                        Yes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ======================================
+                         BUTTON
+                    ======================================= -->
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary predict-btn">
+
+                            <i class="bi bi-cpu-fill"></i>
+
+                            Run Risk Classification
+
+                        </button>
+
+
+                        <button
+                            type="reset"
+                            class="btn btn-light reset-btn"
+                            onclick="resetDashboard()">
+
+                            <i class="bi bi-arrow-counterclockwise"></i>
+
+                            Reset
+
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             RIGHT SIDE
+        ================================================== -->
+
+        <div class="col-xl-5">
+
+
+            <!-- ==============================================
+                 OVERALL RESULT
+            =============================================== -->
+
+            <div class="dashboard-card result-main-card">
+
+                <div class="card-title-area">
+
+                    <div>
+
+                        <span class="small-label">
+                            CLASSIFICATION
+                        </span>
+
+                        <h4>
+                            Risk Assessment
+                        </h4>
+
+                    </div>
+
+                    <div class="title-icon">
+
+                        <i class="bi bi-shield-check"></i>
+
+                    </div>
+
+                </div>
+
+
+                {% if prediction_done %}
+
+                    <div class="overall-result {{ overall_class }}">
+
+                        {% if overall_result == "High Risk" %}
+
+                            <div class="overall-icon">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+
+                        {% else %}
+
+                            <div class="overall-icon">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+
+                        {% endif %}
+
+
+                        <div>
+
+                            <span>
+                                OVERALL RESULT
+                            </span>
+
+                            <h2>
+                                {{ overall_result }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="average-box">
+
+                        <div>
+
+                            <span>
+                                Average Risk Probability
+                            </span>
+
+                            <strong>
+                                {{ average_probability }}%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ average_probability }}%">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-state-icon">
+
+                            <i class="bi bi-clipboard2-pulse"></i>
+
+                        </div>
+
+                        <h5>
+                            Ready for Assessment
+                        </h5>
+
+                        <p>
+                            Complete the assessment form to
+                            generate the lung cancer risk
+                            classification.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+
+            <!-- ==============================================
+                 MODEL RESULTS
+            =============================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <div class="card-title-area">
+
+                    <div>
+
+                        <span class="small-label">
+                            MODEL ANALYSIS
+                        </span>
+
+                        <h4>
+                            Model Results
+                        </h4>
+
+                    </div>
+
+                    <i class="bi bi-bar-chart-fill title-simple-icon"></i>
+
+                </div>
+
+
+
+                <!-- Logistic Regression -->
+
+                <div class="model-result">
+
+                    <div class="model-result-header">
+
+                        <div class="model-symbol blue-symbol">
+
+                            <i class="bi bi-diagram-3-fill"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h6>
+                                Logistic Regression
+                            </h6>
+
+                            <span>
+                                Binary Classification
+                            </span>
+
+                        </div>
+
+                        {% if prediction_done %}
+
+                            <span class="model-status">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="model-status">
+                                Loaded
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if prediction_done %}
+
+                        <div class="risk-row">
+
+                            <span>
+                                Prediction
+                            </span>
+
+                            <strong class="{{ lr_class }}">
+                                {{ lr_result }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="probability-row">
+
+                            <span>
+                                Probability
+                            </span>
+
+                            <strong>
+                                {{ lr_probability }}%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="progress model-progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ lr_probability }}%">
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="model-waiting">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Ready to classify patient data.
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- Random Forest -->
+
+                <div class="model-result">
+
+                    <div class="model-result-header">
+
+                        <div class="model-symbol green-symbol">
+
+                            <i class="bi bi-tree-fill"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h6>
+                                Random Forest
+                            </h6>
+
+                            <span>
+                                Ensemble Classification
+                            </span>
+
+                        </div>
+
+                        {% if prediction_done %}
+
+                            <span class="model-status">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="model-status">
+                                Loaded
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if prediction_done %}
+
+                        <div class="risk-row">
+
+                            <span>
+                                Prediction
+                            </span>
+
+                            <strong class="{{ rf_class }}">
+                                {{ rf_result }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="probability-row">
+
+                            <span>
+                                Probability
+                            </span>
+
+                            <strong>
+                                {{ rf_probability }}%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="progress model-progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ rf_probability }}%">
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="model-waiting">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Ready to classify patient data.
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+
+            {% if prediction_done %}
+
+
+            <!-- ==============================================
+                 MODEL AGREEMENT
+            =============================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <div class="agreement-box {{ agreement_class }}">
+
+                    <div class="agreement-icon">
+
+                        {% if model_agreement == "Models Agree" %}
+
+                            <i class="bi bi-check2-all"></i>
+
+                        {% else %}
+
+                            <i class="bi bi-exclamation-circle-fill"></i>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            {{ model_agreement }}
+                        </strong>
+
+                        <p>
+                            Logistic Regression and Random
+                            Forest comparison.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==============================================
+                 CHART
+            =============================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <div class="card-title-area">
+
+                    <div>
+
+                        <span class="small-label">
+                            COMPARISON
+                        </span>
+
+                        <h4>
+                            Probability Comparison
+                        </h4>
+
+                    </div>
+
+                    <i class="bi bi-bar-chart-line-fill title-simple-icon"></i>
+
+                </div>
+
+
+                <div class="chart-wrapper">
+
+                    <canvas id="probabilityChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==============================================
+                 INPUT SUMMARY
+            =============================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <div class="card-title-area">
+
+                    <div>
+
+                        <span class="small-label">
+                            INPUT SUMMARY
+                        </span>
+
+                        <h4>
+                            Assessment Summary
+                        </h4>
+
+                    </div>
+
+                </div>
+
+
+                {% if positive_features %}
+
+                    <div class="feature-list">
+
+                        {% for feature in positive_features %}
+
+                            <span>
+                                <i class="bi bi-check-circle-fill"></i>
+                                {{ feature }}
+                            </span>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="no-feature">
+
+                        No lifestyle or symptom indicators
+                        selected as Yes.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ======================================================
+     DISCLAIMER
+====================================================== -->
+
+<section class="disclaimer-section">
+
+    <div class="container">
+
+        <div class="disclaimer-box">
+
+            <div class="disclaimer-icon">
+
+                <i class="bi bi-info-circle-fill"></i>
+
+            </div>
+
+            <div>
+
+                <h6>
+                    Important Disclaimer
+                </h6>
+
+                <p>
+                    This application is developed for
+                    educational and research purposes only.
+                    The classification results are not a
+                    medical diagnosis and should not replace
+                    professional medical examination,
+                    diagnosis, or treatment.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="footer-content">
+
+            <div>
+
+                <strong>
+
+                    <i class="bi bi-lungs-fill"></i>
+
+                    Lung Cancer
+
+                </strong>
+
+                <p>
+                    Machine Learning Classification System
+                </p>
+
+            </div>
+
+
+            <div class="footer-right">
+
+                Logistic Regression
+
+                <span>•</span>
+
+                Random Forest
+
+            </div>
+
+        </div>
+
+
+        <hr>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 Lung Cancer Risk Classification — Reza Irfan Akmal Bonggi
+            </span>
+
+            <span>
+                Educational Project
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- ======================================================
+     CHART DATA
+====================================================== -->
+
+{% if prediction_done %}
+
+<script>
+
+    const chartLabels =
+        {{ chart_labels | tojson }};
+
+    const chartProbabilities =
+        {{ chart_probabilities | tojson }};
+
+</script>
+
+{% endif %}
+
+
+
+<!-- Bootstrap -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- Chart.js -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js">
+</script>
+
+
+<!-- Custom JS -->
+
+<script
+    src="{{ url_for('static', filename='js/chart.js') }}">
+</script>
+
+
+</body>
+
+</html>

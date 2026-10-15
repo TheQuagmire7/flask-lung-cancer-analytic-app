@@ -1,0 +1,492 @@
+{% extends "base.html" %}
+
+
+{% if mode == "add" %}
+
+    {% set title = "Add " + dataset_type|title + " Data" %}
+
+{% else %}
+
+    {% set title = "Edit " + dataset_type|title + " Data" %}
+
+{% endif %}
+
+
+{% block title %}
+
+{{ title }} - Lung Cancer
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+
+    <div>
+
+        <span class="section-label">
+            DATASET MANAGEMENT
+        </span>
+
+        <h1>
+            {{ title }}
+        </h1>
+
+        <p>
+            Enter patient medical history and lifestyle indicators.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for(dataset_type) }}"
+        class="btn btn-light border">
+
+        <i class="bi bi-arrow-left me-2"></i>
+
+        Back
+
+    </a>
+
+
+</div>
+
+
+<form method="POST">
+
+
+<div class="row g-4">
+
+
+<!-- =====================================================
+     PATIENT INFORMATION
+===================================================== -->
+
+<div class="col-lg-6">
+
+
+    <div class="dashboard-card h-100">
+
+
+        <div class="card-heading">
+
+            <div>
+
+                <span class="section-label">
+                    SECTION 01
+                </span>
+
+                <h4>
+                    Patient Information
+                </h4>
+
+                <p>
+                    Basic demographic information.
+                </p>
+
+            </div>
+
+            <i class="bi bi-person-fill heading-icon"></i>
+
+        </div>
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Gender
+            </label>
+
+            <select
+                name="gender"
+                class="form-select"
+                required>
+
+                <option value="">
+                    Select Gender
+                </option>
+
+                <option
+                    value="1"
+                    {% if row and row["gender"] == 1 %}
+                    selected
+                    {% endif %}>
+
+                    Male
+
+                </option>
+
+                <option
+                    value="0"
+                    {% if row and row["gender"] == 0 %}
+                    selected
+                    {% endif %}>
+
+                    Female
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Age
+            </label>
+
+            <input
+                type="number"
+                name="age"
+                min="1"
+                max="120"
+                class="form-control"
+                placeholder="Enter age"
+                value="{% if row %}{{ row['age'] }}{% endif %}"
+                required>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     LIFESTYLE
+===================================================== -->
+
+<div class="col-lg-6">
+
+
+    <div class="dashboard-card h-100">
+
+
+        <div class="card-heading">
+
+            <div>
+
+                <span class="section-label">
+                    SECTION 02
+                </span>
+
+                <h4>
+                    Lifestyle Habits
+                </h4>
+
+                <p>
+                    Lifestyle and behavioral factors.
+                </p>
+
+            </div>
+
+            <i class="bi bi-activity heading-icon"></i>
+
+        </div>
+
+
+        {% set lifestyle = [
+            ("smoking", "Smoking"),
+            ("yellow_fingers", "Yellow Fingers"),
+            ("anxiety", "Anxiety"),
+            ("peer_pressure", "Peer Pressure"),
+            ("chronic_disease", "Chronic Disease"),
+            ("alcohol_consuming", "Alcohol Consuming")
+        ] %}
+
+
+        {% for name, label in lifestyle %}
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                {{ label }}
+            </label>
+
+            <select
+                name="{{ name }}"
+                class="form-select"
+                required>
+
+                <option value="">
+                    Select Answer
+                </option>
+
+                <option
+                    value="1"
+                    {% if row and row[name] == 1 %}
+                    selected
+                    {% endif %}>
+
+                    Yes
+
+                </option>
+
+                <option
+                    value="2"
+                    {% if row and row[name] == 2 %}
+                    selected
+                    {% endif %}>
+
+                    No
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     SYMPTOMS
+===================================================== -->
+
+<div class="col-lg-12">
+
+
+    <div class="dashboard-card">
+
+
+        <div class="card-heading">
+
+            <div>
+
+                <span class="section-label">
+                    SECTION 03
+                </span>
+
+                <h4>
+                    Symptoms
+                </h4>
+
+                <p>
+                    Patient symptoms and health indicators.
+                </p>
+
+            </div>
+
+            <i class="bi bi-heart-pulse-fill heading-icon"></i>
+
+        </div>
+
+
+        <div class="row g-3">
+
+
+            {% set symptoms = [
+                ("fatigue", "Fatigue"),
+                ("allergy", "Allergy"),
+                ("wheezing", "Wheezing"),
+                ("coughing", "Coughing"),
+                ("shortness_of_breath", "Shortness of Breath"),
+                ("swallowing_difficulty", "Swallowing Difficulty"),
+                ("chest_pain", "Chest Pain")
+            ] %}
+
+
+            {% for name, label in symptoms %}
+
+
+            <div class="col-md-6 col-lg-4">
+
+
+                <label class="form-label">
+                    {{ label }}
+                </label>
+
+
+                <select
+                    name="{{ name }}"
+                    class="form-select"
+                    required>
+
+                    <option value="">
+                        Select Answer
+                    </option>
+
+                    <option
+                        value="1"
+                        {% if row and row[name] == 1 %}
+                        selected
+                        {% endif %}>
+
+                        Yes
+
+                    </option>
+
+                    <option
+                        value="2"
+                        {% if row and row[name] == 2 %}
+                        selected
+                        {% endif %}>
+
+                        No
+
+                    </option>
+
+                </select>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     TARGET
+===================================================== -->
+
+<div class="col-lg-6">
+
+
+    <div class="dashboard-card">
+
+
+        <div class="card-heading">
+
+            <div>
+
+                <span class="section-label">
+                    TARGET
+                </span>
+
+                <h4>
+                    Lung Cancer
+                </h4>
+
+                <p>
+                    Classification target value.
+                </p>
+
+            </div>
+
+            <i class="bi bi-shield-check heading-icon"></i>
+
+        </div>
+
+
+        <select
+            name="lung_cancer"
+            class="form-select"
+            required>
+
+            <option value="">
+                Select Result
+            </option>
+
+            <option
+                value="1"
+                {% if row and row["lung_cancer"] == 1 %}
+                selected
+                {% endif %}>
+
+                YES
+
+            </option>
+
+            <option
+                value="0"
+                {% if row and row["lung_cancer"] == 0 %}
+                selected
+                {% endif %}>
+
+                NO
+
+            </option>
+
+        </select>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     ACTION
+===================================================== -->
+
+<div class="col-lg-6">
+
+
+    <div class="dashboard-card form-submit-card">
+
+
+        <div class="form-actions">
+
+
+            <a
+                href="{{ url_for(dataset_type) }}"
+                class="btn btn-light border">
+
+                Cancel
+
+            </a>
+
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+
+                {% if mode == "add" %}
+
+                    <i class="bi bi-plus-circle me-2"></i>
+
+                    Save Data
+
+                {% else %}
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Update Data
+
+                {% endif %}
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+</form>
+
+
+{% endblock %}

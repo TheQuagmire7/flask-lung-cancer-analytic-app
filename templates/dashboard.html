@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+
+{% if page_title %}
+    {{ page_title }} - Lung Cancer
+{% else %}
+    Dashboard - Lung Cancer
+{% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- ===================================================== -->
+<!-- DASHBOARD -->
+<!-- ===================================================== -->
+
+{% if not page_title %}
+
+<div class="page-header">
+
+    <div>
+
+        <span class="section-label">
+            OVERVIEW
+        </span>
+
+        <h1>
+            Lung Cancer Risk Dashboard
+        </h1>
+
+        <p>
+            Monitor patient data, machine learning models,
+            predictions, and classification results.
+        </p>
+
+    </div>
+
+
+    <div class="header-date">
+
+        <i class="bi bi-calendar3"></i>
+
+        <span id="currentDate"></span>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- STATISTICS -->
+<!-- ===================================================== -->
+
+<div class="row g-4 mb-4">
+
+
+    <!-- PATIENT -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+            <div>
+
+                <span>Total Patients</span>
+
+                <h2>
+                    {{ total_patients }}
+                </h2>
+
+                <small>
+                    Registered patients
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRAINING -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon purple">
+
+                <i class="bi bi-database-fill"></i>
+
+            </div>
+
+            <div>
+
+                <span>Training Data</span>
+
+                <h2>
+                    {{ total_training }}
+                </h2>
+
+                <small>
+                    Records used for training
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TESTING -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon orange">
+
+                <i class="bi bi-clipboard2-pulse-fill"></i>
+
+            </div>
+
+            <div>
+
+                <span>Testing Data</span>
+
+                <h2>
+                    {{ total_testing }}
+                </h2>
+
+                <small>
+                    Evaluation records
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PREDICTIONS -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+
+                <i class="bi bi-activity"></i>
+
+            </div>
+
+            <div>
+
+                <span>Total Predictions</span>
+
+                <h2>
+                    {{ total_predictions }}
+                </h2>
+
+                <small>
+                    Completed analyses
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODEL SECTION -->
+<!-- ===================================================== -->
+
+<div class="row g-4">
+
+
+    <div class="col-lg-8">
+
+        <div class="dashboard-card">
+
+            <div class="card-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        MACHINE LEARNING
+                    </span>
+
+                    <h4>
+                        Classification Models
+                    </h4>
+
+                    <p>
+                        Models available for lung cancer
+                        risk classification.
+                    </p>
+
+                </div>
+
+                <i class="bi bi-cpu-fill heading-icon"></i>
+
+            </div>
+
+
+            <div class="model-list">
+
+
+                <!-- LOGISTIC -->
+
+                <div class="model-item">
+
+                    <div class="model-icon blue">
+
+                        <i class="bi bi-diagram-3-fill"></i>
+
+                    </div>
+
+                    <div class="model-info">
+
+                        <h5>
+                            Logistic Regression
+                        </h5>
+
+                        <p>
+                            Binary classification model
+                        </p>
+
+                    </div>
+
+                    <div class="model-badge">
+                        <span class="status-dot"></span>
+                        Ready
+                    </div>
+
+                </div>
+
+
+                <!-- RANDOM FOREST -->
+
+                <div class="model-item">
+
+                    <div class="model-icon green">
+
+                        <i class="bi bi-tree-fill"></i>
+
+                    </div>
+
+                    <div class="model-info">
+
+                        <h5>
+                            Random Forest
+                        </h5>
+
+                        <p>
+                            Ensemble classification model
+                        </p>
+
+                    </div>
+
+                    <div class="model-badge">
+                        <span class="status-dot"></span>
+                        Ready
+                    </div>
+
+                </div>
+
+
+                <!-- SCALER -->
+
+                <div class="model-item">
+
+                    <div class="model-icon purple">
+
+                        <i class="bi bi-rulers"></i>
+
+                    </div>
+
+                    <div class="model-info">
+
+                        <h5>
+                            Standard Scaler
+                        </h5>
+
+                        <p>
+                            Feature normalization
+                        </p>
+
+                    </div>
+
+                    <div class="model-badge">
+                        <span class="status-dot"></span>
+                        Ready
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- RISK SUMMARY -->
+    <!-- ================================================= -->
+
+    <div class="col-lg-4">
+
+        <div class="dashboard-card risk-summary">
+
+            <div class="card-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        PREDICTION SUMMARY
+                    </span>
+
+                    <h4>
+                        Risk Distribution
+                    </h4>
+
+                </div>
+
+                <i class="bi bi-shield-check heading-icon"></i>
+
+            </div>
+
+
+            <div class="risk-stat high">
+
+                <div>
+
+                    <span>
+                        High Risk
+                    </span>
+
+                    <h3>
+                        {{ high_risk }}
+                    </h3>
+
+                </div>
+
+                <div class="risk-circle">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+
+            </div>
+
+
+            <div class="risk-stat low">
+
+                <div>
+
+                    <span>
+                        Low Risk
+                    </span>
+
+                    <h3>
+                        {{ low_risk }}
+                    </h3>
+
+                </div>
+
+                <div class="risk-circle">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- QUICK ACTION -->
+<!-- ===================================================== -->
+
+<div class="dashboard-card mt-4">
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                QUICK ACTION
+            </span>
+
+            <h4>
+                Start Patient Analysis
+            </h4>
+
+            <p>
+                Create a patient record and perform
+                lung cancer risk classification.
+            </p>
+
+        </div>
+
+        <i class="bi bi-arrow-right-circle heading-icon"></i>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+        <a
+            href="{{ url_for('prediction') }}"
+            class="quick-action blue-action">
+
+            <i class="bi bi-cpu"></i>
+
+            <div>
+
+                <strong>
+                    New Prediction
+                </strong>
+
+                <span>
+                    Analyze patient risk
+                </span>
+
+            </div>
+
+            <i class="bi bi-chevron-right"></i>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('patients') }}"
+            class="quick-action">
+
+            <i class="bi bi-person-plus"></i>
+
+            <div>
+
+                <strong>
+                    Patient Data
+                </strong>
+
+                <span>
+                    Manage patient records
+                </span>
+
+            </div>
+
+            <i class="bi bi-chevron-right"></i>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('training') }}"
+            class="quick-action">
+
+            <i class="bi bi-database"></i>
+
+            <div>
+
+                <strong>
+                    Training Dataset
+                </strong>
+
+                <span>
+                    View machine learning data
+                </span>
+
+            </div>
+
+            <i class="bi bi-chevron-right"></i>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- DISCLAIMER -->
+<!-- ===================================================== -->
+
+<div class="disclaimer mt-4">
+
+    <div class="disclaimer-icon">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+    </div>
+
+    <div>
+
+        <strong>
+            Important Disclaimer
+        </strong>
+
+        <p>
+            This application is developed for educational
+            and research purposes. Classification results
+            are generated by machine learning models and
+            are not a medical diagnosis. Results should not
+            replace professional medical advice.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% else %}
+
+
+<!-- ===================================================== -->
+<!-- TEMPORARY PAGE -->
+<!-- ===================================================== -->
+
+<div class="page-header">
+
+    <div>
+
+        <span class="section-label">
+            SYSTEM MODULE
+        </span>
+
+        <h1>
+            {{ page_title }}
+        </h1>
+
+        <p>
+            This module will be developed in the next stage.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% if page_title == "Training Data" %}
+
+<div class="dashboard-card">
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                DATASET
+            </span>
+
+            <h4>
+                Training Dataset
+            </h4>
+
+            <p>
+                Total records: {{ total_training }}
+            </p>
+
+        </div>
+
+        <i class="bi bi-database-fill heading-icon"></i>
+
+    </div>
+
+
+    <div class="table-responsive">
+
+        <table class="table modern-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Smoking</th>
+                    <th>Wheezing</th>
+                    <th>Coughing</th>
+                    <th>Lung Cancer</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in training_data %}
+
+                <tr>
+
+                    <td>
+                        {{ row["id"] }}
+                    </td>
+
+                    <td>
+                        {% if row["gender"] == 1 %}
+                            Male
+                        {% else %}
+                            Female
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ row["age"] }}
+                    </td>
+
+                    <td>
+                        {{ row["smoking"] }}
+                    </td>
+
+                    <td>
+                        {{ row["wheezing"] }}
+                    </td>
+
+                    <td>
+                        {{ row["coughing"] }}
+                    </td>
+
+                    <td>
+
+                        {% if row["lung_cancer"] == 1 %}
+
+                            <span class="badge-risk high">
+                                YES
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge-risk low">
+                                NO
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+{% elif page_title == "Testing Data" %}
+
+
+<div class="dashboard-card">
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                DATASET
+            </span>
+
+            <h4>
+                Testing Dataset
+            </h4>
+
+            <p>
+                Total records: {{ total_testing }}
+            </p>
+
+        </div>
+
+        <i class="bi bi-clipboard2-pulse heading-icon"></i>
+
+    </div>
+
+
+    <div class="table-responsive">
+
+        <table class="table modern-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Smoking</th>
+                    <th>Wheezing</th>
+                    <th>Coughing</th>
+                    <th>Lung Cancer</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in testing_data %}
+
+                <tr>
+
+                    <td>
+                        {{ row["id"] }}
+                    </td>
+
+                    <td>
+                        {% if row["gender"] == 1 %}
+                            Male
+                        {% else %}
+                            Female
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ row["age"] }}
+                    </td>
+
+                    <td>
+                        {{ row["smoking"] }}
+                    </td>
+
+                    <td>
+                        {{ row["wheezing"] }}
+                    </td>
+
+                    <td>
+                        {{ row["coughing"] }}
+                    </td>
+
+                    <td>
+
+                        {% if row["lung_cancer"] == 1 %}
+
+                            <span class="badge-risk high">
+                                YES
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge-risk low">
+                                NO
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+{% else %}
+
+
+<div class="dashboard-card empty-module">
+
+    <div class="empty-icon">
+
+        <i class="bi bi-tools"></i>
+
+    </div>
+
+    <h3>
+        {{ page_title }}
+    </h3>
+
+    <p>
+        This module is ready for development.
+    </p>
+
+</div>
+
+
+{% endif %}
+
+
+{% endif %}
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+const dateElement =
+    document.getElementById("currentDate");
+
+if (dateElement) {
+
+    const today = new Date();
+
+    dateElement.innerText =
+        today.toLocaleDateString(
+            "en-US",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+}
+
+</script>
+
+{% endblock %}

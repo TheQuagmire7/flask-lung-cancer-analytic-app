@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History - Lung Cancer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="section-label">MACHINE LEARNING</span>
+        <h1>Prediction History</h1>
+        <p>Riwayat hasil klasifikasi pasien yang telah dilakukan.</p>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="table-responsive">
+        <table class="table modern-table align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Logistic</th>
+                    <th>Random Forest</th>
+                    <th>Average Probability</th>
+                    <th>Overall Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in predictions %}
+                <tr>
+                    <td>{{ row['prediction_date'] }}</td>
+                    <td>{{ row['patient_name'] }}</td>
+                    <td>{{ "%.2f"|format(row['logistic_probability']) }}%</td>
+                    <td>{{ "%.2f"|format(row['random_forest_probability']) }}%</td>
+                    <td>{{ "%.2f"|format(row['average_probability']) }}%</td>
+                    <td>
+                        {% if row['overall_result'] == 'High Risk' %}
+                        <span class="badge-risk high">HIGH RISK</span>
+                        {% else %}
+                        <span class="badge-risk low">LOW RISK</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center py-5">Belum ada riwayat prediction.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

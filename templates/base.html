@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Lung Cancer
+        {% endblock %}
+    </title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+    <!-- Custom CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app-wrapper">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+                <i class="bi bi-lungs"></i>
+            </div>
+
+            <div>
+                <h5>Lung Cancer</h5>
+                <small>Classification System</small>
+            </div>
+
+            <button type="button" class="sidebar-close"
+                    onclick="closeSidebar()" aria-label="Tutup sidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+
+        <!-- MENU -->
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('dashboard') }}"
+               class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+
+                <i class="bi bi-grid-1x2-fill"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="{{ url_for('patients') }}"
+               class="menu-item {% if request.endpoint in ['patients', 'add_patient', 'edit_patient'] %}active{% endif %}">
+
+                <i class="bi bi-people-fill"></i>
+
+                <span>Patient Data</span>
+
+            </a>
+
+
+            <a href="{{ url_for('training') }}"
+               class="menu-item {% if request.endpoint in ['training', 'add_training', 'edit_training'] %}active{% endif %}">
+
+                <i class="bi bi-database-fill"></i>
+
+                <span>Training Data</span>
+
+            </a>
+
+
+            <a href="{{ url_for('testing') }}"
+               class="menu-item {% if request.endpoint in ['testing', 'add_testing', 'edit_testing'] %}active{% endif %}">
+
+                <i class="bi bi-clipboard2-pulse-fill"></i>
+
+                <span>Testing Data</span>
+
+            </a>
+
+
+            <div class="menu-title">
+                MACHINE LEARNING
+            </div>
+
+
+            <a href="{{ url_for('prediction') }}"
+               class="menu-item {% if request.endpoint == 'prediction' %}active{% endif %}">
+
+                <i class="bi bi-cpu-fill"></i>
+
+                <span>Prediction</span>
+
+            </a>
+
+
+            <a href="{{ url_for('history') }}"
+               class="menu-item {% if request.endpoint == 'history' %}active{% endif %}">
+
+                <i class="bi bi-clock-history"></i>
+
+                <span>Prediction History</span>
+
+            </a>
+
+
+            <a href="{{ url_for('evaluation') }}"
+               class="menu-item {% if request.endpoint == 'evaluation' %}active{% endif %}">
+
+                <i class="bi bi-bar-chart-fill"></i>
+
+                <span>Model Evaluation</span>
+
+            </a>
+
+
+            <div class="menu-title">
+                SYSTEM
+            </div>
+
+
+            <a href="{{ url_for('reports') }}"
+               class="menu-item {% if request.endpoint in ['reports', 'export_report'] %}active{% endif %}">
+
+                <i class="bi bi-file-earmark-text-fill"></i>
+
+                <span>Reports</span>
+
+            </a>
+
+
+            <a href="{{ url_for('settings') }}"
+               class="menu-item {% if request.endpoint == 'settings' %}active{% endif %}">
+
+                <i class="bi bi-gear-fill"></i>
+
+                <span>Settings</span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR FOOTER -->
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+
+                    <strong>System Online</strong>
+
+                    <small>Machine Learning Ready</small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ================================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ================================================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <button
+                class="btn sidebar-toggle"
+                onclick="toggleSidebar()">
+
+                <i class="bi bi-list"></i>
+
+            </button>
+
+
+            <div class="topbar-title">
+
+                <h6>
+                    {% if page_title %}
+                        {{ page_title }}
+                    {% else %}
+                        Dashboard
+                    {% endif %}
+                </h6>
+
+                <small>
+                    Lung Cancer Risk Classification System
+                </small>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="model-status">
+
+                    <span class="status-dot"></span>
+
+                    <span>Models Available</span>
+
+                </div>
+
+                <div class="user-profile">
+
+                    <div class="user-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+
+                    <div class="user-info">
+
+                        <strong>{{ admin_name }}</strong>
+
+                        <small>Research System</small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="content-area">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                    <div class="alert alert-{{ 'danger' if category == 'danger' else category }} alert-dismissible fade show"
+                         role="alert">
+
+                        {{ message }}
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+
+        <!-- FOOTER -->
+
+        <footer class="main-footer">
+
+            <div>
+
+                <strong>
+                    <i class="bi bi-lungs"></i>
+                    Lung Cancer
+                </strong>
+
+                <span>
+                    — Machine Learning Classification System
+                </span>
+
+            </div>
+
+            <div>
+                © 2026 Research Project — Reza Irfan Akmal Bonggi
+            </div>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<script>
+
+function isMobile() {
+    return window.innerWidth <= 991;
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+
+    if (isMobile()) {
+        sidebar.classList.toggle("sidebar-hidden");
+        document.body.classList.toggle("sidebar-open");
+    } else {
+        document.body.classList.toggle("sidebar-collapsed");
+        localStorage.setItem(
+            "sidebarCollapsed",
+            document.body.classList.contains("sidebar-collapsed") ? "1" : "0"
+        );
+    }
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById("sidebar");
+
+    if (isMobile()) {
+        sidebar.classList.add("sidebar-hidden");
+        document.body.classList.remove("sidebar-open");
+    } else {
+        document.body.classList.add("sidebar-collapsed");
+        localStorage.setItem("sidebarCollapsed", "1");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("sidebar");
+
+    if (isMobile()) {
+        sidebar.classList.add("sidebar-hidden");
+    } else if (localStorage.getItem("sidebarCollapsed") === "1") {
+        document.body.classList.add("sidebar-collapsed");
+    }
+
+    window.addEventListener("resize", function () {
+        if (isMobile()) {
+            document.body.classList.remove("sidebar-collapsed");
+            sidebar.classList.add("sidebar-hidden");
+            document.body.classList.remove("sidebar-open");
+        } else {
+            sidebar.classList.remove("sidebar-hidden");
+        }
+    });
+});
+
+</script>
+
+
+{% block scripts %}
+
+{% endblock %}
+</body>
+</html>

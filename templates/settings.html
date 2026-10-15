@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}Settings - Lung Cancer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="section-label">SYSTEM CONFIGURATION</span>
+        <h1>Settings</h1>
+        <p>Atur konfigurasi dasar aplikasi dan parameter klasifikasi.</p>
+    </div>
+</div>
+
+<form method="POST">
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="dashboard-card mb-4">
+            <div class="card-heading">
+                <div><span class="section-label">GENERAL</span><h4>General Settings</h4><p>Informasi yang ditampilkan pada sistem.</p></div>
+                <i class="bi bi-sliders heading-icon"></i>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Administrator Name</label>
+                <input type="text" name="admin_name" class="form-control" value="{{ admin_name }}" maxlength="50" required>
+                <div class="form-text">Nama akan tampil pada topbar.</div>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Rows Per Page</label>
+                <select name="rows_per_page" class="form-select">
+                    {% for n in [5,10,20,50] %}
+                    <option value="{{ n }}" {% if rows_per_page|int == n %}selected{% endif %}>{{ n }} records</option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">Jumlah data pada tabel Training dan Testing.</div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-heading">
+                <div><span class="section-label">CLASSIFICATION</span><h4>Risk Threshold</h4><p>Batas rata-rata probabilitas untuk High Risk.</p></div>
+                <i class="bi bi-shield-exclamation heading-icon"></i>
+            </div>
+            <div class="threshold-value">
+                <strong id="thresholdPreview">{{ risk_threshold|float|round(0)|int }}%</strong>
+                <span>High Risk jika average probability ≥ threshold</span>
+            </div>
+            <input type="range" name="risk_threshold" id="riskThreshold" class="form-range" min="1" max="99" step="1" value="{{ risk_threshold|float|round(0)|int }}">
+            <div class="d-flex justify-content-between small text-muted"><span>1%</span><span>50%</span><span>99%</span></div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="dashboard-card mb-4">
+            <div class="card-heading">
+                <div><span class="section-label">SYSTEM STATUS</span><h4>Model Files</h4><p>Status file yang dipakai prediction.</p></div>
+                <i class="bi bi-cpu-fill heading-icon"></i>
+            </div>
+            {% for name, available in model_status.items() %}
+            <div class="setting-status-item">
+                <div><i class="bi {% if available %}bi-check-circle-fill{% else %}bi-x-circle-fill{% endif %}"></i><span>{{ name }}</span></div>
+                <span class="status-pill {% if available %}ok{% else %}error{% endif %}">{% if available %}READY{% else %}MISSING{% endif %}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="dashboard-card mb-4">
+            <div class="card-heading">
+                <div><span class="section-label">DATABASE</span><h4>Database Information</h4></div>
+                <i class="bi bi-database-check heading-icon"></i>
+            </div>
+            <div class="setting-info"><span>Database</span><strong>{{ database_path }}</strong></div>
+            <div class="setting-info"><span>Storage</span><strong>SQLite</strong></div>
+            <div class="setting-info"><span>Application</span><strong>Flask + Bootstrap</strong></div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-heading">
+                <div><span class="section-label">SAVE</span><h4>Apply Changes</h4><p>Perubahan dipakai setelah disimpan.</p></div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-check2-circle me-1"></i> Save Settings
+            </button>
+        </div>
+    </div>
+</div>
+</form>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-12">
+        <div class="dashboard-card">
+            <div class="card-heading">
+                <div>
+                    <span class="section-label">DATASET MANAGEMENT</span>
+                    <h4>Upload &amp; Reset Dataset</h4>
+                    <p>Ganti dataset training/testing dengan file CSV baru, atau hapus dataset yang ada.</p>
+                </div>
+                <i class="bi bi-file-earmark-spreadsheet-fill heading-icon"></i>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="setting-info"><span>Training Data</span><strong>{{ training_count }} rows</strong></div>
+                    <div class="setting-info"><span>Testing Data</span><strong>{{ testing_count }} rows</strong></div>
+                    <div class="form-text mt-2">
+                        Format CSV wajib memiliki kolom:
+                        GENDER, AGE, SMOKING, YELLOW_FINGERS, ANXIETY,
+                        PEER_PRESSURE, CHRONIC_DISEASE, FATIGUE, ALLERGY,
+                        WHEEZING, ALCOHOL_CONSUMING, COUGHING,
+                        SHORTNESS_OF_BREATH, SWALLOWING_DIFFICULTY,
+                        CHEST_PAIN, LUNG_CANCER.
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="form-label">Upload Dataset Baru (.csv)</label>
+                    <form
+                        method="POST"
+                        action="{{ url_for('upload_dataset') }}"
+                        enctype="multipart/form-data">
+
+                        <input
+                            type="file"
+                            name="dataset_file"
+                            accept=".csv"
+                            class="form-control mb-3"
+                            required>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-upload me-1"></i> Upload &amp; Preview Dataset
+                        </button>
+
+                    </form>
+                    <div class="form-text mt-2">
+                        File akan divalidasi &amp; ditampilkan pratinjau dulu.
+                        Dataset lama baru diganti setelah kamu konfirmasi
+                        di halaman preview (dataset lama dibackup otomatis,
+                        model juga dilatih ulang otomatis).
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="form-label">Hapus Dataset</label>
+                    <form
+                        method="POST"
+                        action="{{ url_for('clear_dataset_route') }}"
+                        id="clearDatasetForm">
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-danger w-100"
+                            data-bs-toggle="modal"
+                            data-bs-target="#clearDatasetModal">
+
+                            <i class="bi bi-trash3 me-1"></i> Hapus Semua Dataset
+
+                        </button>
+
+                    </form>
+                    <div class="form-text mt-2">
+                        Menghapus seluruh data training dan testing tanpa mengganti dengan data baru.
+                        Dataset lama akan dibackup otomatis sebelum dihapus.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-12">
+        <div class="dashboard-card">
+            <div class="card-heading">
+                <div>
+                    <span class="section-label">BACKUP</span>
+                    <h4>Riwayat Backup Dataset</h4>
+                    <p>Snapshot otomatis dataset lama sebelum diganti/dihapus.</p>
+                </div>
+                <i class="bi bi-clock-history heading-icon"></i>
+            </div>
+
+            {% if dataset_backups %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nama File</th>
+                            <th>Jumlah Baris</th>
+                            <th>Ukuran</th>
+                            <th>Dibuat</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in dataset_backups %}
+                        <tr>
+                            <td>{{ backup.filename }}</td>
+                            <td>{{ backup.rows }}</td>
+                            <td>{{ backup.size_kb }} KB</td>
+                            <td>{{ backup.created_at }}</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('download_backup', filename=backup.filename) }}"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-download"></i> Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Belum ada backup dataset.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM CLEAR MODAL -->
+<div class="modal fade" id="clearDatasetModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                    Hapus Dataset
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Seluruh data <strong>training ({{ training_count }} rows)</strong> dan
+                   <strong>testing ({{ testing_count }} rows)</strong> akan dihapus permanen.</p>
+                <p class="text-muted small mb-0">Dataset lama akan dibackup otomatis sebelum dihapus.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="clearDatasetForm" class="btn btn-danger">
+                    <i class="bi bi-trash3 me-1"></i> Ya, Hapus Dataset
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const slider = document.getElementById("riskThreshold");
+    const preview = document.getElementById("thresholdPreview");
+    if (slider && preview) {
+        slider.addEventListener("input", function () {
+            preview.textContent = this.value + "%";
+        });
+    }
+});
+</script>
+{% endblock %}

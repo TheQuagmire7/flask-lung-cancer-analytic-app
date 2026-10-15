@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Reports - Lung Cancer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="section-label">SYSTEM REPORT</span>
+        <h1>Reports</h1>
+        <p>Ringkasan data pasien, hasil prediksi, dan evaluasi model.</p>
+    </div>
+    <div class="report-actions">
+        <a href="{{ url_for('export_report') }}" class="btn btn-primary">
+            <i class="bi bi-download me-1"></i> Export CSV
+        </a>
+        <button type="button" class="btn btn-light border" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Print
+        </button>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+{% for icon, cls, title, value, sub in [
+    ('bi-people-fill','blue','Total Patients',total_patients,'Registered patients'),
+    ('bi-database-fill','purple','Training Data',total_training,'Training records'),
+    ('bi-clipboard2-pulse-fill','orange','Testing Data',total_testing,'Testing records'),
+    ('bi-activity','green','Total Predictions',total_predictions,'Completed analyses')
+] %}
+<div class="col-xl-3 col-md-6">
+    <div class="stat-card">
+        <div class="stat-icon {{ cls }}"><i class="bi {{ icon }}"></i></div>
+        <div><span>{{ title }}</span><h2>{{ value }}</h2><small>{{ sub }}</small></div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="dashboard-card h-100">
+            <div class="card-heading">
+                <div><span class="section-label">RISK DISTRIBUTION</span><h4>Prediction Summary</h4></div>
+                <i class="bi bi-pie-chart-fill heading-icon"></i>
+            </div>
+            <div class="risk-stat high">
+                <div><span>High Risk</span><h3>{{ high_risk }}</h3></div>
+                <div class="risk-circle"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            </div>
+            <div class="risk-stat low">
+                <div><span>Low Risk</span><h3>{{ low_risk }}</h3></div>
+                <div class="risk-circle"><i class="bi bi-check-circle-fill"></i></div>
+            </div>
+            <div class="report-note">
+                <i class="bi bi-info-circle"></i>
+                <span>Risk threshold: <strong>{{ "%.0f"|format(risk_threshold) }}%</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="dashboard-card h-100">
+            <div class="card-heading">
+                <div><span class="section-label">MODEL EVALUATION</span><h4>Performance Summary</h4></div>
+                <i class="bi bi-bar-chart-fill heading-icon"></i>
+            </div>
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead>
+                    <tbody>
+                    {% for row in evaluations %}
+                    <tr>
+                        <td><strong>{{ row['model_name'] }}</strong></td>
+                        <td>{{ "%.2f"|format(row['accuracy']*100) }}%</td>
+                        <td>{{ "%.2f"|format(row['precision']*100) }}%</td>
+                        <td>{{ "%.2f"|format(row['recall']*100) }}%</td>
+                        <td>{{ "%.2f"|format(row['f1_score']*100) }}%</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center py-4">Belum ada data evaluasi.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card mt-4">
+    <div class="card-heading">
+        <div><span class="section-label">RECENT ACTIVITY</span><h4>10 Prediction Terbaru</h4></div>
+        <a href="{{ url_for('history') }}" class="btn btn-light border">Lihat Semua</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table modern-table align-middle">
+            <thead><tr><th>Date</th><th>Patient</th><th>Logistic</th><th>Random Forest</th><th>Average</th><th>Result</th></tr></thead>
+            <tbody>
+            {% for row in recent_predictions %}
+            <tr>
+                <td>{{ row['prediction_date'] }}</td>
+                <td><strong>{{ row['patient_name'] }}</strong></td>
+                <td>{{ "%.2f"|format(row['logistic_probability']) }}%</td>
+                <td>{{ "%.2f"|format(row['random_forest_probability']) }}%</td>
+                <td>{{ "%.2f"|format(row['average_probability']) }}%</td>
+                <td>
+                    {% if row['overall_result'] == 'High Risk' %}
+                    <span class="badge-risk high">HIGH RISK</span>
+                    {% else %}
+                    <span class="badge-risk low">LOW RISK</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-center py-5">Belum ada riwayat prediction.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

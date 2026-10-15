@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+
+{% if mode == "add" %}
+
+    {% set title = "Add Patient" %}
+
+{% else %}
+
+    {% set title = "Edit Patient" %}
+
+{% endif %}
+
+
+{% block title %}
+
+{{ title }} - Lung Cancer
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <span class="section-label">
+            PATIENT MANAGEMENT
+        </span>
+
+        <h1>
+            {{ title }}
+        </h1>
+
+        <p>
+            Enter basic patient information.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('patients') }}"
+        class="btn btn-light border">
+
+        <i class="bi bi-arrow-left me-2"></i>
+
+        Back
+
+    </a>
+
+</div>
+
+
+<div class="row justify-content-center">
+
+
+    <div class="col-xl-8 col-lg-10">
+
+
+        <div class="dashboard-card">
+
+
+            <div class="card-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        PATIENT INFORMATION
+                    </span>
+
+                    <h4>
+                        Basic Information
+                    </h4>
+
+                    <p>
+                        Complete all required patient information.
+                    </p>
+
+                </div>
+
+                <i class="bi bi-person-vcard-fill heading-icon"></i>
+
+            </div>
+
+
+            <form method="POST">
+
+
+                <div class="row g-4">
+
+
+                    <!-- PATIENT CODE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Patient Code
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            name="patient_code"
+                            class="form-control"
+                            placeholder="Example: P001"
+                            value="{% if patient %}{{ patient['patient_code'] }}{% endif %}"
+                            required>
+
+                        <div class="form-text">
+                            Unique identifier for the patient.
+                        </div>
+
+                    </div>
+
+
+                    <!-- PATIENT NAME -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Patient Name
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            name="patient_name"
+                            class="form-control"
+                            placeholder="Enter patient name"
+                            value="{% if patient %}{{ patient['patient_name'] }}{% endif %}"
+                            required>
+
+                    </div>
+
+
+                    <!-- GENDER -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Gender
+                        </label>
+
+                        <select
+                            name="gender"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                Select Gender
+                            </option>
+
+                            <option
+                                value="1"
+                                {% if patient and patient['gender'] == 1 %}
+                                selected
+                                {% endif %}>
+
+                                Male
+
+                            </option>
+
+                            <option
+                                value="0"
+                                {% if patient and patient['gender'] == 0 %}
+                                selected
+                                {% endif %}>
+
+                                Female
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- AGE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Age
+                        </label>
+
+                        <input
+                            type="number"
+                            name="age"
+                            min="1"
+                            max="120"
+                            class="form-control"
+                            placeholder="Enter age"
+                            value="{% if patient %}{{ patient['age'] }}{% endif %}"
+                            required>
+
+                    </div>
+
+
+                </div>
+
+
+                <hr class="my-4">
+
+
+                <div class="form-actions">
+
+
+                    <a
+                        href="{{ url_for('patients') }}"
+                        class="btn btn-light border">
+
+                        Cancel
+
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
+                        {% if mode == "add" %}
+
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Save Patient
+
+                        {% else %}
+
+                            <i class="bi bi-check-circle me-2"></i>
+                            Update Patient
+
+                        {% endif %}
+
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

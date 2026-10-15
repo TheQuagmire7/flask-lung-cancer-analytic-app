@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Model Evaluation - Lung Cancer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="section-label">MACHINE LEARNING</span>
+        <h1>Model Evaluation</h1>
+        <p>Evaluasi model menggunakan testing data yang tersimpan di database.</p>
+    </div>
+    <form method="POST" action="{{ url_for('train_model') }}">
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-arrow-repeat me-1"></i> Train Model
+        </button>
+    </form>
+</div>
+
+<div class="row g-4">
+    {% for row in evaluations %}
+    <div class="col-lg-6">
+        <div class="dashboard-card">
+            <div class="card-heading">
+                <div>
+                    <span class="section-label">MODEL</span>
+                    <h4>{{ row['model_name'] }}</h4>
+                </div>
+                <i class="bi bi-bar-chart-fill heading-icon"></i>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="p-3 border rounded">
+                        <small>Accuracy</small>
+                        <h3>{{ "%.2f"|format(row['accuracy'] * 100) }}%</h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 border rounded">
+                        <small>Precision</small>
+                        <h3>{{ "%.2f"|format(row['precision'] * 100) }}%</h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 border rounded">
+                        <small>Recall</small>
+                        <h3>{{ "%.2f"|format(row['recall'] * 100) }}%</h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 border rounded">
+                        <small>F1-Score</small>
+                        <h3>{{ "%.2f"|format(row['f1_score'] * 100) }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="dashboard-card text-center py-5">
+            <i class="bi bi-bar-chart fs-1"></i>
+            <h4 class="mt-3">Evaluation belum tersedia</h4>
+            <p>Tekan <strong>Train Model</strong> untuk melatih dan mengevaluasi model.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="dashboard-card mt-4">
+    <div class="card-heading">
+        <div>
+            <span class="section-label">METRICS</span>
+            <h4>Model Comparison</h4>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table modern-table">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Accuracy</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1-Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in evaluations %}
+                <tr>
+                    <td><strong>{{ row['model_name'] }}</strong></td>
+                    <td>{{ "%.2f"|format(row['accuracy'] * 100) }}%</td>
+                    <td>{{ "%.2f"|format(row['precision'] * 100) }}%</td>
+                    <td>{{ "%.2f"|format(row['recall'] * 100) }}%</td>
+                    <td>{{ "%.2f"|format(row['f1_score'] * 100) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

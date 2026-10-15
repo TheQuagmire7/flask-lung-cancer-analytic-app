@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+
+{{ page_title }} - Lung Cancer
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+
+    <div>
+
+        <span class="section-label">
+            DATASET MANAGEMENT
+        </span>
+
+        <h1>
+            {{ page_title }}
+        </h1>
+
+        <p>
+            Manage machine learning dataset records.
+        </p>
+
+    </div>
+
+
+    {% if dataset_type == "training" %}
+
+        <a
+            href="{{ url_for('add_training') }}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Training Data
+
+        </a>
+
+    {% else %}
+
+        <a
+            href="{{ url_for('add_testing') }}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Testing Data
+
+        </a>
+
+    {% endif %}
+
+
+</div>
+
+
+<!-- =====================================================
+     SEARCH & FILTER
+===================================================== -->
+
+<div class="dashboard-card mb-4">
+
+
+    <form
+        method="GET"
+        action="{{ url_for(dataset_type) }}"
+        class="row g-3 align-items-end">
+
+
+        <div class="col-lg-6">
+
+            <label class="form-label">
+                Search
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    class="form-control"
+                    placeholder="Search by ID or age...">
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-3">
+
+            <label class="form-label">
+                Lung Cancer
+            </label>
+
+            <select
+                name="risk"
+                class="form-select">
+
+                <option
+                    value="all"
+                    {% if risk_filter == "all" %}
+                    selected
+                    {% endif %}>
+
+                    All Results
+
+                </option>
+
+                <option
+                    value="1"
+                    {% if risk_filter == "1" %}
+                    selected
+                    {% endif %}>
+
+                    YES
+
+                </option>
+
+                <option
+                    value="0"
+                    {% if risk_filter == "0" %}
+                    selected
+                    {% endif %}>
+
+                    NO
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="col-lg-1">
+
+            <button
+                type="submit"
+                class="btn btn-primary w-100">
+
+                <i class="bi bi-search"></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="col-lg-2">
+
+            <a
+                href="{{ url_for(dataset_type) }}"
+                class="btn btn-light border w-100">
+
+                <i class="bi bi-arrow-counterclockwise me-1"></i>
+
+                Reset
+
+            </a>
+
+        </div>
+
+
+    </form>
+
+
+</div>
+
+
+<!-- =====================================================
+     DATA TABLE
+===================================================== -->
+
+<div class="dashboard-card">
+
+
+    <div class="card-heading">
+
+
+        <div>
+
+            <span class="section-label">
+                DATABASE
+            </span>
+
+            <h4>
+                {{ page_title }}
+            </h4>
+
+            <p>
+                Showing {{ rows|length }} of {{ total }} records
+            </p>
+
+        </div>
+
+
+        {% if dataset_type == "training" %}
+
+            <i class="bi bi-database-fill heading-icon"></i>
+
+        {% else %}
+
+            <i class="bi bi-clipboard2-pulse-fill heading-icon"></i>
+
+        {% endif %}
+
+
+    </div>
+
+
+    <div class="table-responsive">
+
+
+        <table class="table modern-table dataset-table">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Gender
+                    </th>
+
+                    <th>
+                        Age
+                    </th>
+
+                    <th>
+                        Smoking
+                    </th>
+
+                    <th>
+                        Yellow Fingers
+                    </th>
+
+                    <th>
+                        Anxiety
+                    </th>
+
+                    <th>
+                        Wheezing
+                    </th>
+
+                    <th>
+                        Coughing
+                    </th>
+
+                    <th>
+                        Chest Pain
+                    </th>
+
+                    <th>
+                        Lung Cancer
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for row in rows %}
+
+
+                <tr>
+
+
+                    <td>
+                        {{ row["id"] }}
+                    </td>
+
+
+                    <td>
+
+                        {% if row["gender"] == 1 %}
+                            M
+                        {% else %}
+                            F
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ row["age"] }}
+                    </td>
+
+
+                    <td>
+                        {{ row["smoking"] }}
+                    </td>
+
+
+                    <td>
+                        {{ row["yellow_fingers"] }}
+                    </td>
+
+
+                    <td>
+                        {{ row["anxiety"] }}
+                    </td>
+
+
+                    <td>
+                        {{ row["wheezing"] }}
+                    </td>
+
+
+                    <td>
+                        {{ row["coughing"] }}
+                    </td>
+
+
+                    <td>
+                        {{ row["chest_pain"] }}
+                    </td>
+
+
+                    <td>
+
+
+                        {% if row["lung_cancer"] == 1 %}
+
+                            <span class="badge-risk high">
+                                YES
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge-risk low">
+                                NO
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                    <td>
+
+
+                        <div class="action-buttons">
+
+
+                            {% if dataset_type == "training" %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'edit_training',
+                                        record_id=row['id']
+                                    ) }}"
+                                    class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal{{ row['id'] }}">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+
+                            {% else %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'edit_testing',
+                                        record_id=row['id']
+                                    ) }}"
+                                    class="btn btn-sm btn-outline-primary">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal{{ row['id'] }}">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </td>
+
+
+                </tr>
+
+
+                <!-- DELETE MODAL -->
+
+                <div
+                    class="modal fade"
+                    id="deleteModal{{ row['id'] }}"
+                    tabindex="-1">
+
+
+                    <div class="modal-dialog modal-dialog-centered">
+
+
+                        <div class="modal-content">
+
+
+                            <div class="modal-header">
+
+                                <h5 class="modal-title">
+
+                                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+
+                                    Delete Dataset Record
+
+                                </h5>
+
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal">
+                                </button>
+
+                            </div>
+
+
+                            <div class="modal-body">
+
+                                <p>
+                                    Are you sure you want to delete
+                                    record
+                                    <strong>
+                                        #{{ row["id"] }}
+                                    </strong>?
+                                </p>
+
+                                <p class="text-muted small mb-0">
+                                    This action cannot be undone.
+                                </p>
+
+                            </div>
+
+
+                            <div class="modal-footer">
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-light border"
+                                    data-bs-dismiss="modal">
+
+                                    Cancel
+
+                                </button>
+
+
+                                {% if dataset_type == "training" %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'delete_training',
+                                            record_id=row['id']
+                                        ) }}">
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger">
+
+                                            Delete
+
+                                        </button>
+
+                                    </form>
+
+                                {% else %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'delete_testing',
+                                            record_id=row['id']
+                                        ) }}">
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger">
+
+                                            Delete
+
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% else %}
+
+
+                <tr>
+
+                    <td
+                        colspan="11"
+                        class="text-center py-5">
+
+                        <div class="empty-table">
+
+                            <i class="bi bi-database"></i>
+
+                            <h5>
+                                No data found
+                            </h5>
+
+                            <p>
+                                Try changing your search or filter.
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+    <!-- =================================================
+         PAGINATION
+    ================================================= -->
+
+    {% if total_pages > 1 %}
+
+
+    <div class="pagination-wrapper">
+
+
+        <span class="pagination-info">
+
+            Page {{ page }} of {{ total_pages }}
+
+        </span>
+
+
+        <div class="pagination">
+
+
+            {% if page > 1 %}
+
+            <a
+                href="{{ url_for(
+                    dataset_type,
+                    page=page-1,
+                    search=search,
+                    risk=risk_filter
+                ) }}"
+                class="page-link">
+
+                <i class="bi bi-chevron-left"></i>
+
+            </a>
+
+            {% endif %}
+
+
+            {% for p in range(1, total_pages + 1) %}
+
+
+                {% if p >= page - 2 and p <= page + 2 %}
+
+                <a
+                    href="{{ url_for(
+                        dataset_type,
+                        page=p,
+                        search=search,
+                        risk=risk_filter
+                    ) }}"
+                    class="page-link
+                           {% if p == page %}active{% endif %}">
+
+                    {{ p }}
+
+                </a>
+
+                {% endif %}
+
+
+            {% endfor %}
+
+
+            {% if page < total_pages %}
+
+            <a
+                href="{{ url_for(
+                    dataset_type,
+                    page=page+1,
+                    search=search,
+                    risk=risk_filter
+                ) }}"
+                class="page-link">
+
+                <i class="bi bi-chevron-right"></i>
+
+            </a>
+
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}

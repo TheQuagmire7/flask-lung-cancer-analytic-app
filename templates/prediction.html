@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction - Lung Cancer<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const patientSelect = document.querySelector('select[name="patient_id"]');
+    const genderInput = document.getElementById("gender");
+    const ageInput = document.getElementById("age");
+
+    function fillPatientData() {
+        const selected = patientSelect.options[patientSelect.selectedIndex];
+
+        if (!selected || !selected.value) {
+            genderInput.value = "";
+            ageInput.value = "";
+            genderInput.disabled = false;
+            ageInput.readOnly = false;
+            return;
+        }
+
+        const gender = selected.dataset.gender;
+        const age = selected.dataset.age;
+
+        if (gender !== "") {
+            genderInput.value = gender;
+        }
+
+        if (age !== "") {
+            ageInput.value = age;
+        }
+
+        // Data dasar pasien otomatis terisi dan tidak diedit manual.
+        genderInput.disabled = true;
+        ageInput.readOnly = true;
+    }
+
+    patientSelect.addEventListener("change", fillPatientData);
+
+    // Jalankan juga saat halaman pertama kali dibuka,
+    // misalnya setelah prediction gagal dan form dikembalikan.
+    fillPatientData();
+});
+</script>
+
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="section-label">MACHINE LEARNING</span>
+        <h1>Lung Cancer Prediction</h1>
+        <p>Masukkan data pasien untuk melakukan klasifikasi menggunakan Logistic Regression dan Random Forest.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="dashboard-card">
+            <div class="card-heading">
+                <div>
+                    <span class="section-label">PATIENT ANALYSIS</span>
+                    <h4>Patient Symptoms & Risk Factors</h4>
+                    <p>Gunakan nilai sesuai dataset: 1 = No, 2 = Yes.</p>
+                </div>
+                <i class="bi bi-cpu-fill heading-icon"></i>
+            </div>
+
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Patient</label>
+                        <select class="form-select" name="patient_id">
+                            <option value="">Manual Prediction</option>
+                            {% for patient in patients %}
+                            <option value="{{ patient['id'] }}"
+                                data-gender="{{ patient['gender'] if patient['gender'] is not none else '' }}"
+                                data-age="{{ patient['age'] if patient['age'] is not none else '' }}"
+                                {% if request.form.get('patient_id') == patient['id']|string %}selected{% endif %}>
+                                {{ patient['patient_code'] }} - {{ patient['patient_name'] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Gender</label>
+                        <select id="gender" class="form-select" name="gender" required>
+                            <option value="1" {% if form_data.get('gender', 1) == 1 %}selected{% endif %}>Male</option>
+                            <option value="0" {% if form_data.get('gender') == 0 %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Age</label>
+                        <input id="age" type="number" class="form-control" name="age" min="1" max="120"
+                               value="{{ form_data.get('age', '') }}" required>
+                    </div>
+
+                    {% for feature in features if feature not in ['gender', 'age'] %}
+                    <div class="col-md-4">
+                        <label class="form-label">{{ feature_labels[feature] }}</label>
+                        <select class="form-select" name="{{ feature }}" required>
+                            <option value="1" {% if form_data.get(feature, 1) == 1 %}selected{% endif %}>No</option>
+                            <option value="2" {% if form_data.get(feature) == 2 %}selected{% endif %}>Yes</option>
+                        </select>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-cpu me-1"></i> Run Prediction
+                    </button>
+                    <a href="{{ url_for('prediction') }}" class="btn btn-outline-secondary">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {% if result %}
+        <div class="dashboard-card h-100">
+            <span class="section-label">RESULT</span>
+            <h4 class="mt-2">{{ result.patient_name }}</h4>
+
+            <div class="text-center py-4">
+                {% if result.overall_result == 'High Risk' %}
+                <i class="bi bi-exclamation-triangle-fill fs-1 text-danger"></i>
+                <h2 class="text-danger mt-2">HIGH RISK</h2>
+                {% else %}
+                <i class="bi bi-check-circle-fill fs-1 text-success"></i>
+                <h2 class="text-success mt-2">LOW RISK</h2>
+                {% endif %}
+                <p class="mb-0">Average probability: <strong>{{ result.average_probability }}%</strong></p>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between mb-3">
+                <span>Logistic Regression</span>
+                <strong>{{ result.logistic_probability }}%</strong>
+            </div>
+            <div class="progress mb-4" style="height: 8px;">
+                <div class="progress-bar" style="width: {{ result.logistic_probability }}%"></div>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+                <span>Random Forest</span>
+                <strong>{{ result.random_forest_probability }}%</strong>
+            </div>
+            <div class="progress" style="height: 8px;">
+                <div class="progress-bar" style="width: {{ result.random_forest_probability }}%"></div>
+            </div>
+
+            <div class="alert alert-warning mt-4 mb-0">
+                <small><strong>Disclaimer:</strong> Hasil ini untuk penelitian/pendidikan dan bukan diagnosis medis.</small>
+            </div>
+        </div>
+        {% else %}
+        <div class="dashboard-card h-100 d-flex flex-column justify-content-center text-center">
+            <i class="bi bi-activity fs-1 mb-3"></i>
+            <h4>Ready for Prediction</h4>
+            <p class="text-muted">Isi data pasien lalu tekan <strong>Run Prediction</strong>.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const patientSelect = document.querySelector('select[name="patient_id"]');
+    const genderInput = document.getElementById("gender");
+    const ageInput = document.getElementById("age");
+
+    function fillPatientData() {
+        const selected = patientSelect.options[patientSelect.selectedIndex];
+
+        if (!selected || !selected.value) {
+            genderInput.value = "";
+            ageInput.value = "";
+            genderInput.disabled = false;
+            ageInput.readOnly = false;
+            return;
+        }
+
+        const gender = selected.dataset.gender;
+        const age = selected.dataset.age;
+
+        if (gender !== "") {
+            genderInput.value = gender;
+        }
+
+        if (age !== "") {
+            ageInput.value = age;
+        }
+
+        // Data dasar pasien otomatis terisi dan tidak diedit manual.
+        genderInput.disabled = true;
+        ageInput.readOnly = true;
+    }
+
+    patientSelect.addEventListener("change", fillPatientData);
+
+    // Jalankan juga saat halaman pertama kali dibuka,
+    // misalnya setelah prediction gagal dan form dikembalikan.
+    fillPatientData();
+});
+</script>
+
+{% endblock %}
